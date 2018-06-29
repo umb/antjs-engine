@@ -1,6 +1,6 @@
 package filehandling
 
-import ant.PlayerAnt
+import ant.PlayerScript
 import kotlinx.coroutines.experimental.await
 import kotlin.js.Promise
 
@@ -42,8 +42,8 @@ object FileLoader {
         return clients;
     }
 
-    fun loadClientCode(path: String): PlayerAnt? {
+    fun loadClientCode(path: String): PlayerScript? {
         val moduleHolder = require(path)
-        return moduleHolder?.unsafeCast<PlayerAnt>()
+        return moduleHolder?.unsafeCast<PlayerScript>()
     }
 }

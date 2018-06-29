@@ -1,10 +1,11 @@
 package engine
 
-import ant.Ant
-import ant.PlayerAnt
+import ant.PlayerScript
+import engine.gameobjects.AntGameObject
 import filehandling.FileLoader
 
-class Client(val id: String, val scriptPath: String, val ant: PlayerAnt?)
+class Client(val id: String, val scriptPath: String, val playerScript: PlayerScript?)
+
 
 object Engine {
     private val clients: MutableList<Client> = mutableListOf()
@@ -20,34 +21,37 @@ object Engine {
 
             val client = Client(clientId, scriptPath, FileLoader.loadClientCode(scriptPath))
 
-            //TODO this is hacky
-            // client.ant.asDynamic()["moveStraight"] = 1
-
-            val ant: Ant = Ant(clientId)
-
-            patchClientAnt(client.ant, ant)
-
+            colonies.getOrPut(client) { AntColony(clientId) }
 
             clients.add(client)
         }
     }
 
+
+    private val colonies: MutableMap<Client, AntColony> = mutableMapOf()
+
+
     fun simulate() {
         for (client in clients) {
-            step(client)
+            val colony = colonies.getValue(client)
+            for (ant in colony.ants) {
+                patchClientAnt(client.playerScript, ant)
+                step(client)
+
+            }
         }
     }
 
     private fun step(client: Client) {
         try {
-            client.ant?.idle()
+            client.playerScript?.idle()
         } catch (e: Exception) {
             console.log("Error with client ${client.id}: $e")
         }
 
     }
 
-    private fun patchClientAnt(player: PlayerAnt?, ant: Ant) {
+    private fun patchClientAnt(player: PlayerScript?, ant: AntGameObject) {
         player?.asDynamic().moveStraight = { dist: Int -> moveStraight(ant, dist) }
     }
 

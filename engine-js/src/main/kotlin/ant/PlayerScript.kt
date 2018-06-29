@@ -1,13 +1,9 @@
 package ant
 
-class GameObject
+import engine.gameobjects.*
 
-class Sugar
-class Apple
-data class Ant(val playerId: String)
-class Bug
 
-interface PlayerAnt {
+interface PlayerScript {
 
     // basic
     fun idle()
@@ -21,10 +17,10 @@ interface PlayerAnt {
 
     // Combat
 
-    fun seeAnt(ant: Ant)
+    fun seeAnt(ant: AntGameObject)
     fun seeBug(bug: Bug)
     fun hasDied()
-    fun arriveAtAnt(ant: Ant)
+    fun arriveAtAnt(ant: AntGameObject)
     fun arriveAtBug(bug: Bug)
 
 }

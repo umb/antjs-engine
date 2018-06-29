@@ -1,7 +1,8 @@
 package engine
 
-import ant.Ant
+import engine.gameobjects.AntGameObject
 
-fun moveStraight(ant: Ant, distance: Int = -1) {
+
+fun moveStraight(ant: AntGameObject, distance: Int = -1) {
     println("$ant moveStraight $distance")
 }
