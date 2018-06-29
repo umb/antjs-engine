@@ -1,15 +1,13 @@
 package engine.gameobjects
 
-import engine.Engine
+import engine.AntColony
+import engine.math.Vec2
 
-data class Position(var x: Double, var y: Double) {
-    companion object {
-        fun randomScaled(scale: Int) = Position(Engine.random() * scale, Engine.random() * scale)
-    }
-}
+abstract class GameObject(val position: Vec2, val id: String)
 
-abstract class GameObject(val position: Position)
-
-class Sugar(position: Position) : GameObject(position)
-class Apple(position: Position) : GameObject(position)
-class Bug(position: Position) : GameObject(position)
+class GameState(
+    val sugar: MutableList<Sugar> = mutableListOf(),
+    val apples: MutableList<Apple> = mutableListOf(),
+    val bugs: MutableList<Bug> = mutableListOf(),
+    val colonies: MutableList<AntColony> = mutableListOf()
+)

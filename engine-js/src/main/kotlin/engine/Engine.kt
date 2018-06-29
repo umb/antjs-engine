@@ -1,16 +1,24 @@
 package engine
 
 import ant.PlayerScript
-import engine.gameobjects.AntGameObject
-import engine.gameobjects.Position
+import engine.gameobjects.*
+import engine.helpers.moveStraight
+import engine.math.Vec2
 import filehandling.FileLoader
+import kotlin.math.floor
 
 class Client(val id: String, val scriptPath: String, val playerScript: PlayerScript?)
 
 object Engine {
-    private val clients: MutableList<Client> = mutableListOf()
-
     val gamefieldsize = 100
+
+    private val colonies: MutableMap<Client, AntColony> = mutableMapOf()
+
+    private val gameState: GameState = GameState()
+
+    init {
+        addBug()
+    }
 
     suspend fun loadClients() {
         val basepath = "/Users/rick/Documents/dynmic-js-test/clients"
@@ -18,51 +26,83 @@ object Engine {
         for (dir in clientDirectories) {
             val clientId = dir.split("/").last()
             val scriptPath = "$dir/ant.js"
-
             println("loading client $clientId with script $scriptPath")
 
             val client = Client(clientId, scriptPath, FileLoader.loadClientCode(scriptPath))
 
-
-
             colonies.getOrPut(client) {
-                val position = Position.randomScaled(gamefieldsize)
-                AntColony(clientId, position)
+                val position = Vec2.randomScaled(gamefieldsize)
+                val colony = AntColony(clientId, position)
+                colonyAdded(colony)
+                colony
             }
-
-            clients.add(client)
         }
     }
 
+    private fun colonyAdded(colony: AntColony) {
+        for (i in 1..5) {
+            gameState.sugar.add(Sugar(Vec2.randomScaled(gamefieldsize), guid()))
 
-    private val colonies: MutableMap<Client, AntColony> = mutableMapOf()
+        }
 
+        for (i in 1..2) {
+            gameState.apples.add(Apple(Vec2.randomScaled(gamefieldsize), guid()))
+
+        }
+
+        gameState.colonies.add(colony)
+    }
+
+
+    fun guid(): String {
+
+        fun s4() = floor((1 + random()) * 0x1000).toString().substring(1)
+
+
+        /*
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+        }
+        */
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+
+    }
+
+
+    fun addBug() {
+        gameState.bugs.add(Bug(Vec2.randomScaled(gamefieldsize), guid()))
+    }
 
     fun simulate() {
-        for (client in clients) {
-            val colony = colonies.getValue(client)
+        for ((client, colony) in colonies) {
             for (ant in colony.ants) {
                 patchClientAnt(client.playerScript, ant)
-                step(client)
-
+                step(client, gameState, ant)
             }
         }
+
+        // save game state
+        val saved = JSON.stringify(gameState)
+        println(saved)
     }
 
     @Suppress("DEPRECATION")
     fun random() = kotlin.js.Math.random()
 
-    private fun step(client: Client) {
+    private fun step(client: Client, gameState: GameState, ant: AntGameObject) {
+
         try {
             client.playerScript?.idle()
         } catch (e: Exception) {
-            console.log("Error with client ${client.id}: $e")
+            println("Error with client ${client.id}: $e")
         }
 
     }
 
     private fun patchClientAnt(player: PlayerScript?, ant: AntGameObject) {
-        player?.asDynamic().moveStraight = { dist: Int -> moveStraight(ant, dist) }
+        player?.asDynamic().moveStraight = { dist: Double -> moveStraight(ant, dist) }
     }
 
 

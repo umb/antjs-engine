@@ -1,6 +1,9 @@
 package ant
 
-import engine.gameobjects.*
+import engine.gameobjects.AntGameObject
+import engine.gameobjects.Apple
+import engine.gameobjects.Bug
+import engine.gameobjects.Sugar
 
 
 interface PlayerScript {
@@ -22,12 +25,5 @@ interface PlayerScript {
     fun hasDied()
     fun arriveAtAnt(ant: AntGameObject)
     fun arriveAtBug(bug: Bug)
-
-}
-
-
-interface Helper {
-    fun moveTo(gameObject: GameObject)
-    fun pickup(gameObject: GameObject)
 
 }
