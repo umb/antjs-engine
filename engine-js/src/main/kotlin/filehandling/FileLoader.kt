@@ -8,6 +8,7 @@ private external fun require(path: String): Any?
 
 private external interface FS {
     fun readdir(path: String): Promise<Array<String>>
+    fun writeFile(path: String, text: String): Promise<Any>
 }
 
 private external interface PathModule {
@@ -45,5 +46,11 @@ object FileLoader {
     fun loadClientCode(path: String): PlayerScript? {
         val moduleHolder = require(path)
         return moduleHolder?.unsafeCast<PlayerScript>()
+    }
+
+    suspend fun savelog(path: String, tick: Int, data: String) {
+        val location = pathModule?.join(path, tick.toString())!!
+        fsModule?.writeFile("${location}.json", data)?.await()
+
     }
 }

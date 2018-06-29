@@ -3,7 +3,7 @@ package engine.gameobjects
 import engine.AntColony
 import engine.math.Vec2
 
-abstract class GameObject(val position: Vec2, val id: String)
+abstract class GameObject(var position: Vec2, val id: String)
 
 class GameState(
     val sugar: MutableList<Sugar> = mutableListOf(),

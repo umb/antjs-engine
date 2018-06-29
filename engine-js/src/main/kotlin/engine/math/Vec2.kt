@@ -15,7 +15,7 @@ data class Vec2(var x: Double, var y: Double) {
         fun ofAngle(orientation: Double): Vec2 {
             val x = cos(orientation)
             val y = sin(orientation)
-            return Vec2(x, y)
+            return Vec2(x, y).apply { normalize() }
         }
     }
 

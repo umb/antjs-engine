@@ -3,7 +3,10 @@ import kotlinx.coroutines.experimental.launch
 
 fun main() = launch {
     Engine.loadClients()
-    Engine.simulate()
+
+    for (i in 1..10) {
+        Engine.simulate()
+    }
 
 
 }

@@ -7,10 +7,12 @@ import engine.math.Vec2
 import filehandling.FileLoader
 import kotlin.math.floor
 
-class Client(val id: String, val scriptPath: String, val playerScript: PlayerScript?)
+class Client(val id: String, val scriptPath: String, val playerScript: PlayerScript)
 
 object Engine {
     val gamefieldsize = 100
+    val basepath = "/Users/rick/Documents/dynmic-js-test/clients"
+
 
     private val colonies: MutableMap<Client, AntColony> = mutableMapOf()
 
@@ -21,14 +23,13 @@ object Engine {
     }
 
     suspend fun loadClients() {
-        val basepath = "/Users/rick/Documents/dynmic-js-test/clients"
         val clientDirectories = FileLoader.walkDir(basepath)
         for (dir in clientDirectories) {
             val clientId = dir.split("/").last()
             val scriptPath = "$dir/ant.js"
             println("loading client $clientId with script $scriptPath")
 
-            val client = Client(clientId, scriptPath, FileLoader.loadClientCode(scriptPath))
+            val client = Client(clientId, scriptPath, FileLoader.loadClientCode(scriptPath)!!)
 
             colonies.getOrPut(client) {
                 val position = Vec2.randomScaled(gamefieldsize)
@@ -75,7 +76,9 @@ object Engine {
         gameState.bugs.add(Bug(Vec2.randomScaled(gamefieldsize), guid()))
     }
 
-    fun simulate() {
+    var tick = 0
+    suspend fun simulate() {
+        tick++
         for ((client, colony) in colonies) {
             for (ant in colony.ants) {
                 patchClientAnt(client.playerScript, ant)
@@ -86,6 +89,7 @@ object Engine {
         // save game state
         val saved = JSON.stringify(gameState)
         println(saved)
+        //FileLoader.savelog("$basepath/log", tick,saved)
     }
 
     @Suppress("DEPRECATION")
@@ -94,7 +98,7 @@ object Engine {
     private fun step(client: Client, gameState: GameState, ant: AntGameObject) {
 
         try {
-            client.playerScript?.idle()
+            ant.update(client.playerScript, gameState)
         } catch (e: Exception) {
             println("Error with client ${client.id}: $e")
         }

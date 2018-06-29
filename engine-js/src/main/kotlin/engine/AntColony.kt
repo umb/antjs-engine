@@ -17,7 +17,7 @@ class AntColony(playerId: String, position: Vec2) : GameObject(position, playerI
 
     init {
         for (i in 1..INITIAL_ANT_COUNT) {
-            val orientation = Engine.random()
+            val orientation = Engine.random() * 2 * kotlin.math.PI
             ants.add(AntGameObject(playerId, orientation, playerId + "_" + i, position))
         }
     }
