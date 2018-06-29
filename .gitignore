@@ -1,0 +1,7 @@
+.idea/
+gradle.properties
+engine-js/node_modules
+engine-js/npm-debug.log
+engine-js/package-lock.json
+/build
+/target
