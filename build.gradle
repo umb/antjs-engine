@@ -1,11 +1,20 @@
-allprojects {
-    group 'ch.curoheroes.engine'
-    version '1-SNAPSHOT'
+apply plugin: 'kotlin2js'
+apply plugin: 'com.moowork.node'
+
+archivesBaseName = 'antme-engine-js'
+
+group 'ch.curoheroes.engine'
+version '1-SNAPSHOT'
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
-task wrapper(type: Wrapper) {
-  gradleVersion = '4.8'
-  distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+ext {
+    nodeVersion = '8.11.3'
+    qunitVersion = '2.6.1'
 }
 
 buildscript {
@@ -23,25 +32,63 @@ buildscript {
     }
 }
 
-ext {
-    nodeVersion = '8.11.3'
-    qunitVersion = '2.6.1'
-    libraries = [
-            junit: "junit:junit:4.12",
-            kotlin_stdlib: "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion",
-            kotlin_stdlib_common: "org.jetbrains.kotlin:kotlin-stdlib-common:$kotlinVersion",
-            kotlin_stdlib_js: "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion",
-            kotlin_test_annotations_common: "org.jetbrains.kotlin:kotlin-test-annotations-common:$kotlinVersion",
-            kotlin_test_common: "org.jetbrains.kotlin:kotlin-test-common:$kotlinVersion",
-            kotlin_test_js: "org.jetbrains.kotlin:kotlin-test-js:$kotlinVersion",
-            kotlin_test_junit: "org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion",
-    ]
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.8'
+    distributionUrl = "https://services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
 }
 
-subprojects {
-    repositories {
-        jcenter()
-        mavenCentral()
-        maven { url 'https://jitpack.io' }
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlinVersion"
+    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core-js:0.23.3'
+
+    testCompile "org.jetbrains.kotlin:kotlin-test-js:$kotlinVersion"
+}
+
+[compileKotlin2Js, compileTestKotlin2Js]*.configure {
+    kotlinOptions.moduleKind = "umd"
+    kotlinOptions.sourceMap = true
+    kotlinOptions.sourceMapEmbedSources = "always"
+}
+
+task populateNodeModules(type: Copy, dependsOn: compileKotlin2Js) {
+    from compileKotlin2Js.destinationDir
+
+    configurations.testCompile.each {
+        from zipTree(it.absolutePath).matching { include '*.js' }
+    }
+
+    into "${buildDir}/node_modules"
+}
+
+node {
+    version = nodeVersion
+    download = true
+}
+
+task installQunit(type: NpmTask) {
+    inputs.property('qunitVersion', qunitVersion)
+    outputs.dir file('node_modules/qunit')
+
+    args = ['install', "qunit@${qunitVersion}"]
+}
+
+task runQunit(type: NodeTask, dependsOn: [compileTestKotlin2Js, populateNodeModules, installQunit]) {
+    script = file('node_modules/qunit/bin/qunit')
+    args = [projectDir.toPath().relativize(file(compileTestKotlin2Js.outputFile).toPath())]
+}
+
+//test.dependsOn runQunit
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.kotlin
+}
+
+artifacts {
+    archives sourcesJar
+}
+kotlin {
+    experimental {
+        coroutines "enable"
     }
 }
