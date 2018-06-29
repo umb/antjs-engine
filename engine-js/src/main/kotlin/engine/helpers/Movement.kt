@@ -1,8 +1,8 @@
 package engine.helpers
 
+import engine.Moving
 import engine.gameobjects.AntGameObject
 import engine.gameobjects.GameObject
-import engine.gameobjects.Moving
 import engine.math.Vec2
 
 

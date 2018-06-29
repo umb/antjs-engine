@@ -1,6 +1,8 @@
-package engine.gameobjects
+package engine
 
 import ant.PlayerScript
+import engine.gameobjects.AntGameObject
+import engine.gameobjects.GameState
 import engine.math.Vec2
 
 sealed class AntState {
@@ -23,6 +25,7 @@ class Moving(val target: Vec2?) : AntState() {
             // TODO check if we have arrived and stop if we have
         }
 
+        // TODO check for out of bounds
         // TODO scan around our position to discover hostile gameobjects and food
     }
 }

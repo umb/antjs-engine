@@ -1,6 +1,8 @@
 package engine.gameobjects
 
 import ant.PlayerScript
+import engine.AntState
+import engine.IdleState
 import engine.math.Vec2
 
 

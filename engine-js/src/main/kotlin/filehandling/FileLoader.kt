@@ -1,14 +1,14 @@
 package filehandling
 
 import ant.PlayerScript
-import kotlinx.coroutines.experimental.await
-import kotlin.js.Promise
 
 private external fun require(path: String): Any?
 
 private external interface FS {
-    fun readdir(path: String): Promise<Array<String>>
-    fun writeFile(path: String, text: String): Promise<Any>
+    fun readdirSync(path: String): Array<String>
+    fun writeFileSync(path: String, text: String)
+    fun mkdirSync(path: String)
+    fun existsSync(path: String): Boolean
 }
 
 private external interface PathModule {
@@ -20,11 +20,11 @@ object FileLoader {
     private var fsModule: FS? = require("mz/fs").unsafeCast<FS>()
     private var pathModule: PathModule? = require("path").unsafeCast<PathModule>()
 
-    suspend fun walkDir(path: String): List<String> {
+    fun walkDir(path: String): List<String> {
         val clients = mutableListOf<String>()
         println("walkdir $path with $fsModule and $pathModule")
 
-        val files = fsModule?.readdir(path)?.await()
+        val files = fsModule?.readdirSync(path)
 
         if (files != null) {
             println("found ${files.size} client directories")
@@ -48,9 +48,14 @@ object FileLoader {
         return moduleHolder?.unsafeCast<PlayerScript>()
     }
 
-    suspend fun savelog(path: String, tick: Int, data: String) {
+    fun savelog(path: String, tick: Int, data: String) {
+
+        if (fsModule?.existsSync(path) == false) {
+            fsModule?.mkdirSync(path)
+        }
         val location = pathModule?.join(path, tick.toString())!!
-        fsModule?.writeFile("${location}.json", data)?.await()
+
+        fsModule?.writeFileSync("${location}.json", data)
 
     }
 }

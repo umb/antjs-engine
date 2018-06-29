@@ -1,7 +1,6 @@
-package engine
+package engine.gameobjects
 
-import engine.gameobjects.AntGameObject
-import engine.gameobjects.GameObject
+import engine.Engine
 import engine.math.Vec2
 
 

@@ -88,8 +88,7 @@ object Engine {
 
         // save game state
         val saved = JSON.stringify(gameState)
-        println(saved)
-        //FileLoader.savelog("$basepath/log", tick,saved)
+        FileLoader.savelog("$basepath/../log", tick, saved)
     }
 
     @Suppress("DEPRECATION")
