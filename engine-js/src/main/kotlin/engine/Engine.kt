@@ -1,8 +1,10 @@
 package engine
 
+import ant.Ant
+import ant.PlayerAnt
 import filehandling.FileLoader
 
-class Client(val id: String, val scriptPath: String, val ant: Ant?)
+class Client(val id: String, val scriptPath: String, val ant: PlayerAnt?)
 
 external fun require(path: String): Any?
 
@@ -22,9 +24,9 @@ module_holder['user_getDetails'](req, res);
         )
     }
 
-    fun loadClientES2015(path: String): Ant? {
+    fun loadClientES2015(path: String): PlayerAnt? {
         val moduleHolder = require(path)
-        return moduleHolder?.unsafeCast<Ant>()
+        return moduleHolder?.unsafeCast<PlayerAnt>()
     }
 
 
@@ -35,18 +37,23 @@ module_holder['user_getDetails'](req, res);
     }
 
     fun loadAllClient(clientDirectories: List<String>) {
-        println(clientDirectories.size)
         for (dir in clientDirectories) {
             val clientId = dir.split("/").last()
             val scriptPath = "$dir/ant.js"
 
             println("loading client $clientId with script $scriptPath")
 
-            val ant = loadClientES2015(scriptPath)
-            val client = Client(clientId, scriptPath, ant)
-            client.ant?.move()
+            val client = Client(clientId, scriptPath, loadClientES2015(scriptPath))
+
+            //TODO this is hacky
+            // client.ant.asDynamic()["moveStraight"] = 1
+
+            val ant: Ant = Ant()
+
+            client.ant.asDynamic().moveStraight = { dist: Int -> moveStraight(ant, dist) }
 
 
+            step(client)
 
             clients.add(client)
         }
@@ -55,7 +62,7 @@ module_holder['user_getDetails'](req, res);
 
     fun step(client: Client) {
         try {
-            client.ant?.move()
+            client.ant?.idle()
         } catch (e: Exception) {
             console.log("Error with client ${client.id}: $e")
         }
