@@ -10,6 +10,8 @@ class Client(val id: String, val scriptPath: String, val ant: Ant)
 //module_holder['user_getDetails'](req, res);
 //        """)
 
+external fun require(path: String): Any?
+
 
 object Engine {
     private val clients = mutableListOf<Client>()
@@ -26,23 +28,19 @@ module_holder['user_getDetails'](req, res);
         )
     }
 
+    fun loadClientES2015(): Ant? {
+        val path = "/Users/rick/Documents/dynmic-js-test/client.js";
+        val moduleHolder = require(path)
+
+
+        return moduleHolder?.unsafeCast<Ant>()
+    }
+
+
     fun loadClients() {
 
-
-        val moduleHolder: dynamic = Any()
-        js(
-            """var path = "/Users/rick/Documents/dynmic-js-test/client.js";
-var module_holder = {};
-var res = {};
-var req = {};
-moduleHolder = require(path);
-"""
-        );
-
-        println("loaded module $moduleHolder")
-
-        val result = moduleHolder.move();
-        console.log("read $result")
+        val ant = loadClientES2015()
+        ant?.move()
 
 
     }
