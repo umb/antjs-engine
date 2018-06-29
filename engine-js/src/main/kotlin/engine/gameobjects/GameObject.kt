@@ -1,8 +1,15 @@
 package engine.gameobjects
 
-abstract class GameObject
+import engine.Engine
 
-class Sugar : GameObject()
-class Apple : GameObject()
-data class AntGameObject(val playerId: String, val id: String) : GameObject()
-class Bug : GameObject()
+data class Position(var x: Double, var y: Double) {
+    companion object {
+        fun randomScaled(scale: Int) = Position(Engine.random() * scale, Engine.random() * scale)
+    }
+}
+
+abstract class GameObject(val position: Position)
+
+class Sugar(position: Position) : GameObject(position)
+class Apple(position: Position) : GameObject(position)
+class Bug(position: Position) : GameObject(position)

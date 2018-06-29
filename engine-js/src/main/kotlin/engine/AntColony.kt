@@ -1,9 +1,10 @@
 package engine
 
 import engine.gameobjects.AntGameObject
+import engine.gameobjects.Position
 
 
-class AntColony(val playerId: String) {
+class AntColony(val playerId: String, val position: Position) {
     companion object {
         const val INITIAL_ANT_COUNT = 10
     }
@@ -12,7 +13,8 @@ class AntColony(val playerId: String) {
 
     init {
         for (i in 1..INITIAL_ANT_COUNT) {
-            ants.add(AntGameObject(playerId, playerId + "_" + i))
+            val orientation = Engine.random()
+            ants.add(AntGameObject(playerId, playerId + "_" + i, orientation, position))
         }
     }
 }
