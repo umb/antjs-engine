@@ -1,5 +1,8 @@
 package filehandling
 
+import kotlinx.coroutines.experimental.await
+import kotlin.js.Promise
+
 /*
 function LoadModules(path) {
     fs.lstat(path, function(err, stat) {
@@ -26,8 +29,7 @@ external fun require(path: String): Any?
 
 
 external interface FS {
-    fun lstat(path: String, callback: (err: Any?, stats: Stats?) -> Unit)
-    fun readdir(path: String, callback: (err: Any?, files: Array<String>?) -> Unit)
+    fun readdir(path: String): Promise<Array<String>>
 }
 
 external interface Stats {
@@ -44,61 +46,57 @@ object FileLoader {
     private var pathModule: PathModule?
 
     init {
-        fsModule = require("fs").unsafeCast<FS>()
+        fsModule = require("mz/fs").unsafeCast<FS>()
         pathModule = require("path").unsafeCast<PathModule>()
     }
 
-    fun walkDir(path: String): List<String> {
+    suspend fun walkDir(path: String): List<String> {
         val clients = mutableListOf<String>()
         println("walkdir $path with $fsModule and $pathModule")
 
-        fsModule?.readdir(path) { err, files ->
+        val files = fsModule?.readdir(path)?.await()
 
-            if (err != null) {
-                println("Error while reading dir $path")
-            } else if (files != null) {
-                println("found ${files.size} client directories")
+        if (files != null) {
+            println("found ${files.size} client directories")
 
-                for (i in 0 until files.size) {
-                    val clientfolder = pathModule?.join(path, files[i])
-                    if (clientfolder != null) {
-                        clients.add(clientfolder)
-                    }
-
+            for (i in 0 until files.size) {
+                val clientfolder = pathModule?.join(path, files[i])
+                if (clientfolder != null) {
+                    clients.add(clientfolder)
                 }
-            } else {
-                println("unexpected error while reading directoy $path")
+
             }
+        } else {
+            println("unexpected error while reading directoy $path")
         }
 
-
-        return clients
+        return clients;
     }
 
-    fun walkDir(path: String, then: (List<String>) -> Unit) {
-        val clients = mutableListOf<String>()
-        println("walkdir $path with $fsModule and $pathModule")
-
-        fsModule?.readdir(path) { err, files ->
-
-            if (err != null) {
-                println("Error while reading dir $path")
-            } else if (files != null) {
-                println("found ${files.size} client directories")
-
-                for (i in 0 until files.size) {
-                    val clientfolder = pathModule?.join(path, files[i])
-                    if (clientfolder != null) {
-                        clients.add(clientfolder)
-                    }
-
-                }
-            } else {
-                println("unexpected error while reading directoy $path")
-            }
-
-            then(clients)
-        }
-    }
-
+//   fun walkDir(path: String, then: (List<String>) -> Unit) {
+//       val clients = mutableListOf<String>()
+//       println("walkdir $path with $fsModule and $pathModule")
+//
+//       fsModule?.readdir(path) { err, files ->
+//
+//           if (err != null) {
+//               println("Error while reading dir $path")
+//           } else if (files != null) {
+//               println("found ${files.size} client directories")
+//
+//               for (i in 0 until files.size) {
+//                   val clientfolder = pathModule?.join(path, files[i])
+//                   if (clientfolder != null) {
+//                       clients.add(clientfolder)
+//                   }
+//
+//               }
+//           } else {
+//               println("unexpected error while reading directoy $path")
+//           }
+//
+//           then(clients)
+//       }
+//   }
+//
 }

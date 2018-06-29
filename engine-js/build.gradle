@@ -6,6 +6,9 @@ archivesBaseName = 'antme-engine-js'
 dependencies {
     expectedBy project(':engine-common')
     compile libraries.kotlin_stdlib_js
+   // compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.23.3'
+    compile 'org.jetbrains.kotlinx:kotlinx-coroutines-core-js:0.23.3'
+
     testCompile libraries.kotlin_test_js
 }
 
@@ -51,4 +54,9 @@ task sourcesJar(type: Jar) {
 
 artifacts {
     archives sourcesJar
+}
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
 }

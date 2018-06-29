@@ -12,31 +12,14 @@ external fun require(path: String): Any?
 object Engine {
     private val clients: MutableList<Client> = mutableListOf()
 
-    private fun loadSimple() {
-        js(
-            """var path = "/Users/rick/Documents/dynmic-js-test/client-simple.js";
-var module_holder = {};
-var res = {};
-var req = {};
-require(path)(module_holder);
-module_holder['user_getDetails'](req, res);
-        """
-        )
-    }
-
     fun loadClientES2015(path: String): PlayerAnt? {
         val moduleHolder = require(path)
         return moduleHolder?.unsafeCast<PlayerAnt>()
     }
 
-
-    fun loadClients() {
+    suspend fun loadClients() {
         val basepath = "/Users/rick/Documents/dynmic-js-test/clients"
-        FileLoader.walkDir(basepath, then = { list -> loadAllClient(list) })
-
-    }
-
-    fun loadAllClient(clientDirectories: List<String>) {
+        val clientDirectories = FileLoader.walkDir(basepath)
         for (dir in clientDirectories) {
             val clientId = dir.split("/").last()
             val scriptPath = "$dir/ant.js"
@@ -48,14 +31,18 @@ module_holder['user_getDetails'](req, res);
             //TODO this is hacky
             // client.ant.asDynamic()["moveStraight"] = 1
 
-            val ant: Ant = Ant()
+            val ant: Ant = Ant(clientId)
 
             client.ant.asDynamic().moveStraight = { dist: Int -> moveStraight(ant, dist) }
 
 
-            step(client)
-
             clients.add(client)
+        }
+    }
+
+    fun simulate() {
+        for (client in clients) {
+            step(client)
         }
     }
 

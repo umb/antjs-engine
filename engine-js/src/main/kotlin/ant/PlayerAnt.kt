@@ -4,7 +4,7 @@ class GameObject
 
 class Sugar
 class Apple
-class Ant
+data class Ant(val playerId: String)
 class Bug
 
 interface PlayerAnt {

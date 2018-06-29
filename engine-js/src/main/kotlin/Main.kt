@@ -1,7 +1,9 @@
 import engine.Engine
+import kotlinx.coroutines.experimental.launch
 
-fun main() {
+fun main() = launch {
     Engine.loadClients()
+    Engine.simulate()
 
 
 }
