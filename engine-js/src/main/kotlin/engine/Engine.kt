@@ -6,16 +6,8 @@ import filehandling.FileLoader
 
 class Client(val id: String, val scriptPath: String, val ant: PlayerAnt?)
 
-external fun require(path: String): Any?
-
-
 object Engine {
     private val clients: MutableList<Client> = mutableListOf()
-
-    fun loadClientES2015(path: String): PlayerAnt? {
-        val moduleHolder = require(path)
-        return moduleHolder?.unsafeCast<PlayerAnt>()
-    }
 
     suspend fun loadClients() {
         val basepath = "/Users/rick/Documents/dynmic-js-test/clients"
@@ -26,14 +18,14 @@ object Engine {
 
             println("loading client $clientId with script $scriptPath")
 
-            val client = Client(clientId, scriptPath, loadClientES2015(scriptPath))
+            val client = Client(clientId, scriptPath, FileLoader.loadClientCode(scriptPath))
 
             //TODO this is hacky
             // client.ant.asDynamic()["moveStraight"] = 1
 
             val ant: Ant = Ant(clientId)
 
-            client.ant.asDynamic().moveStraight = { dist: Int -> moveStraight(ant, dist) }
+            patchClientAnt(client.ant, ant)
 
 
             clients.add(client)
@@ -46,14 +38,17 @@ object Engine {
         }
     }
 
-
-    fun step(client: Client) {
+    private fun step(client: Client) {
         try {
             client.ant?.idle()
         } catch (e: Exception) {
             console.log("Error with client ${client.id}: $e")
         }
 
+    }
+
+    private fun patchClientAnt(player: PlayerAnt?, ant: Ant) {
+        player?.asDynamic().moveStraight = { dist: Int -> moveStraight(ant, dist) }
     }
 
 
