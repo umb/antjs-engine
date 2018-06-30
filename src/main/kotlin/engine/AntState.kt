@@ -23,27 +23,6 @@ class Moving(val target: Vec2?) : AntState() {
         val update = Vec2.ofAngle(ant.orientation) * AntGameObject.speed
         ant.position += update
 
-        if (target != null) {
-            // TODO check if we have arrived and stop if we have arrived
-        }
-
-
-        if (ant.position.x < 0) {
-
-        }
-
-        if (ant.position.x > game.size) {
-
-        }
-
-        if (ant.position.y < 0) {
-
-        }
-
-        if (ant.position.y > game.size) {
-
-        }
-
         // TODO check for out of bounds
         // TODO scan around our position to discover hostile gameobjects and food
 
@@ -58,5 +37,40 @@ class Moving(val target: Vec2?) : AntState() {
         }
 
 
+        if (target != null) {
+            if (ant.position.dist2(target) < AntGameObject.reach2) {
+                val appleInReach = gameState.applesInRange(ant.position, AntGameObject.reach2).firstOrNull()
+                if (appleInReach != null) {
+                    playerScript.arriveAtApple(appleInReach)
+                }
+
+                val sugarInReach = gameState.sugarInRange(ant.position, AntGameObject.reach2).firstOrNull()
+                if (sugarInReach != null) {
+                    playerScript.arriveAtSugar(sugarInReach)
+                }
+            }
+        }
+
+
+        if (ant.position.x < 0) {
+            ant.position.x = 0.0
+            ant.orientation = kotlin.math.PI - ant.orientation
+        }
+
+        if (ant.position.x > game.size) {
+            ant.position.x = game.size.toDouble()
+            ant.orientation = kotlin.math.PI - ant.orientation
+
+        }
+
+        if (ant.position.y < 0) {
+            ant.position.y = 0.0
+            ant.orientation = -ant.orientation % 2 * kotlin.math.PI
+        }
+
+        if (ant.position.y > game.size) {
+            ant.position.y = game.size.toDouble()
+            ant.orientation = -ant.orientation % 2 * kotlin.math.PI
+        }
     }
 }

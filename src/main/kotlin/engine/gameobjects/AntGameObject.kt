@@ -7,7 +7,7 @@ import engine.math.Vec2
 import server.Game
 
 
-class AntGameObject(val playerId: String, val orientation: Double, id: String, position: Vec2) : GameObject(position, playerId) {
+class AntGameObject(val playerId: String, var orientation: Double, id: String, position: Vec2) : GameObject(position, playerId) {
 
     companion object {
         val speed = 5.0
