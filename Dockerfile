@@ -2,7 +2,6 @@
 FROM node:8
 
 
-ADD node_modules node_modules
 ADD build build
 ADD main.sh main.sh
 
