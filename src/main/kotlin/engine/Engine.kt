@@ -2,9 +2,7 @@ package engine
 
 import ant.PlayerScript
 import engine.gameobjects.*
-import engine.helpers.moveStraight
-import engine.helpers.moveTo
-import engine.helpers.stop
+import engine.helpers.*
 import engine.math.Vec2
 import filehandling.FileLoader
 import server.Game
@@ -62,7 +60,7 @@ class Engine(val game: Game) {
         game.tick++
         for ((client, colony) in colonies) {
             for (ant in colony.ants) {
-                patchClientAnt(client.playerScript, ant)
+                patchClientAnt(client.playerScript, ant, colony)
                 step(client, gameState, ant)
             }
         }
@@ -90,10 +88,19 @@ class Engine(val game: Game) {
 
     }
 
-    private fun patchClientAnt(player: PlayerScript?, ant: AntGameObject) {
+    /**
+     * Patch client script dynamically so the functions are there and we later know which ant was meant
+     * it is really hacky
+     */
+    private fun patchClientAnt(player: PlayerScript?, ant: AntGameObject, colony: AntColony) {
         player?.asDynamic().moveStraight = { dist: Double -> moveStraight(ant, dist) }
         player?.asDynamic().stop = { stop(ant) }
         player?.asDynamic().moveTo = { target: GameObject -> moveTo(ant, target) }
+        player?.asDynamic().goHome = { goHome(ant, colony) }
+
+        // food
+        player?.asDynamic().pickup = { target: GameObject -> pickup(ant, target) }
+
     }
 
     fun cleanup() {

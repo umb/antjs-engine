@@ -17,6 +17,8 @@ class AntGameObject(val playerId: String, val orientation: Double, id: String, p
     var state: AntState = IdleState()
         private set
 
+    var carry: GameObject? = null
+
 
     var nextState: AntState = IdleState()
 
