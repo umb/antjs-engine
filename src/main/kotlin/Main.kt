@@ -56,18 +56,20 @@ fun main() {
     }
 
     app.post("/step") { req, res ->
-
         val frames = Frames(engine?.game)
 
         if (engine == null) {
             res.status(409)
-        } else {
+        } else if (engine?.running == false) {
+            engine?.running = true
+
             val steps: Int = (req.query.steps as? String)?.toInt() ?: 1
 
             for (i in 1..steps) {
                 val gamestate = engine?.simulate()
                 frames.frames.add(JSON.stringify(gamestate))
             }
+            engine?.running = false
         }
 
         res.send(frames)

@@ -20,6 +20,8 @@ class Engine(val game: Game) {
         addBug()
     }
 
+    var running = false
+
 
     fun loadClientDirect(clientId: String, code: String) {
 
@@ -79,9 +81,8 @@ class Engine(val game: Game) {
     }
 
     private fun step(client: Client, gameState: GameState, ant: AntGameObject) {
-
         try {
-            ant.update(client.playerScript, gameState)
+            ant.update(client.playerScript, gameState, game)
         } catch (e: Exception) {
             println("Error with client ${client.id}: $e")
         }
@@ -93,6 +94,8 @@ class Engine(val game: Game) {
      * it is really hacky
      */
     private fun patchClientAnt(player: PlayerScript?, ant: AntGameObject, colony: AntColony) {
+        // FIXME reference to the actual gameObject allows for all kinds of shenanigans, we only use position anyways so copy
+
         player?.asDynamic().moveStraight = { dist: Double -> moveStraight(ant, dist) }
         player?.asDynamic().stop = { stop(ant) }
         player?.asDynamic().moveTo = { target: GameObject -> moveTo(ant, target) }

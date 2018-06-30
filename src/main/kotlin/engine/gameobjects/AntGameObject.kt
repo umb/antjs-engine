@@ -4,6 +4,7 @@ import ant.PlayerScript
 import engine.AntState
 import engine.IdleState
 import engine.math.Vec2
+import server.Game
 
 
 class AntGameObject(val playerId: String, val orientation: Double, id: String, position: Vec2) : GameObject(position, playerId) {
@@ -22,8 +23,8 @@ class AntGameObject(val playerId: String, val orientation: Double, id: String, p
 
     var nextState: AntState = IdleState()
 
-    fun update(playerScript: PlayerScript, gameState: GameState) {
-        state.update(playerScript, this, gameState)
+    fun update(playerScript: PlayerScript, gameState: GameState, game: Game) {
+        state.update(playerScript, this, gameState, game)
         state = nextState
     }
 }
