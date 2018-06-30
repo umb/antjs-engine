@@ -3,6 +3,8 @@ package engine
 import ant.PlayerScript
 import engine.gameobjects.*
 import engine.helpers.moveStraight
+import engine.helpers.moveTo
+import engine.helpers.stop
 import engine.math.Vec2
 import filehandling.FileLoader
 import server.Game
@@ -19,7 +21,6 @@ class Engine(val game: Game) {
     init {
         addBug()
     }
-
 
 
     fun loadClientDirect(clientId: String, code: String) {
@@ -91,6 +92,8 @@ class Engine(val game: Game) {
 
     private fun patchClientAnt(player: PlayerScript?, ant: AntGameObject) {
         player?.asDynamic().moveStraight = { dist: Double -> moveStraight(ant, dist) }
+        player?.asDynamic().stop = { stop(ant) }
+        player?.asDynamic().moveTo = { target: GameObject -> moveTo(ant, target) }
     }
 
     fun cleanup() {

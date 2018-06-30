@@ -36,8 +36,6 @@ fun main() {
 
             val game = Game(id, size, duration)
             engine = Engine(game)
-        } else {
-            res.status(409)
         }
 
         res.send(engine?.game)

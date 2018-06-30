@@ -1,5 +1,6 @@
 package engine.helpers
 
+import engine.IdleState
 import engine.Moving
 import engine.gameobjects.AntGameObject
 import engine.gameobjects.GameObject
@@ -18,6 +19,12 @@ fun moveStraight(ant: AntGameObject, distance: Double? = null) {
 }
 
 
-fun moveTo(gameObject: GameObject) {
+fun moveTo(ant: AntGameObject, gameObject: GameObject) {
+    println("$ant moveTo ${gameObject.position}")
 
+    ant.nextState = Moving(gameObject.position)
+}
+
+fun stop(ant: AntGameObject) {
+    ant.nextState = IdleState()
 }
