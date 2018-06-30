@@ -24,7 +24,7 @@ fun main() {
         res.send(engine?.game)
     }
 
-    app.put("/game/:id") { req, res ->
+    app.post("/game") { req, res ->
         val currentEngine = engine
         if (currentEngine == null || currentEngine.game.tick >= currentEngine.game.maxDuration) {
             currentEngine?.cleanup()
@@ -32,7 +32,7 @@ fun main() {
             val size = (req.query.size as? String)?.toInt() ?: 100
             val duration = (req.query.maxDuration as? String)?.toInt() ?: 10_000
 
-            val id = (req.params.id as? String) ?: Engine.guid()
+            val id = Engine.guid()
 
             val game = Game(id, size, duration)
             engine = Engine(game)
