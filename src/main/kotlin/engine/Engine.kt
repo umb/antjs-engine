@@ -8,22 +8,6 @@ import filehandling.FileLoader
 import server.Game
 import kotlin.math.floor
 
-class Client(val id: String, val scriptPath: String?, val playerScript: PlayerScript) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other == null || this::class.js != other::class.js) return false
-
-        other as Client
-
-        if (id != other.id) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return id.hashCode()
-    }
-}
 
 class Engine(val game: Game) {
     val basepath = "/tmp/dynmic-js-test/clients"
@@ -36,16 +20,7 @@ class Engine(val game: Game) {
         addBug()
     }
 
-    companion object {
-        @Suppress("DEPRECATION")
-        fun random() = kotlin.js.Math.random()
 
-        fun guid(): String {
-            fun s4() = floor((1 + random()) * 0x1000).toInt().toString(16)
-            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
-
-        }
-    }
 
     fun loadClientDirect(clientId: String, code: String) {
 
@@ -122,6 +97,16 @@ class Engine(val game: Game) {
 
     }
 
+    companion object {
+        @Suppress("DEPRECATION")
+        fun random() = kotlin.js.Math.random()
+
+        fun guid(): String {
+            fun s4() = floor((1 + random()) * 0x1000).toInt().toString(16)
+            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
+
+        }
+    }
 
 }
 

@@ -10,6 +10,8 @@ class AntGameObject(val playerId: String, val orientation: Double, id: String, p
 
     companion object {
         val speed = 5.0
+        val sightRange2: Double = 20.0 * 20.0
+        val reach2: Double = 5.0 * 5.0
     }
 
     var state: AntState = IdleState()

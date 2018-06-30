@@ -23,6 +23,10 @@ data class Vec2(var x: Double, var y: Double) {
         return Vec2(x + other.x, y + other.y)
     }
 
+    operator fun minus(other: Vec2): Vec2 {
+        return Vec2(x - other.x, y - other.y)
+    }
+
     operator fun times(scalar: Double): Vec2 {
         return Vec2(x * scalar, y * scalar)
     }
@@ -32,6 +36,11 @@ data class Vec2(var x: Double, var y: Double) {
         x /= len
         y /= len
     }
+
+    fun dist(other: Vec2) = (other - this).length
+
+    fun dist2(other: Vec2) = (other - this).length2
+
 
     val normalized: Vec2
         get() = copy().apply { normalize() }

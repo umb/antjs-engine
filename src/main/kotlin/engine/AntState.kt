@@ -3,6 +3,7 @@ package engine
 import ant.PlayerScript
 import engine.gameobjects.AntGameObject
 import engine.gameobjects.GameState
+import engine.gameobjects.Sugar
 import engine.math.Vec2
 
 sealed class AntState {
@@ -22,10 +23,21 @@ class Moving(val target: Vec2?) : AntState() {
         ant.position += update
 
         if (target != null) {
-            // TODO check if we have arrived and stop if we have
+            // TODO check if we have arrived and stop if we have arrived
         }
 
         // TODO check for out of bounds
         // TODO scan around our position to discover hostile gameobjects and food
+
+        val appleInSight = gameState.applesInRange(ant.position, AntGameObject.sightRange2).firstOrNull()
+        if (appleInSight != null && playerScript.asDynamic().seeApple != null) {
+            playerScript.seeApple(appleInSight)
+        }
+
+        val sugarInSight = gameState.inRange<Sugar>(ant.position, AntGameObject.sightRange2).firstOrNull()
+        if (sugarInSight != null && playerScript.asDynamic().seeSugar != null) {
+            playerScript.seeSugar(sugarInSight)
+        }
+
     }
 }

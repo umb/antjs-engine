@@ -1,8 +1,5 @@
 package server
 
-import engine.Engine
-
-data class Game(val size: Int, val maxDuration: Int) {
-    val id: String = Engine.guid()
+data class Game(val id: String, val size: Int, val maxDuration: Int) {
     var tick = 0
 }

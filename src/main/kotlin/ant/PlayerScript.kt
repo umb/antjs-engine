@@ -6,7 +6,7 @@ import engine.gameobjects.Bug
 import engine.gameobjects.Sugar
 
 
-interface PlayerScript {
+external interface PlayerScript {
 
     // basic
     fun idle()
