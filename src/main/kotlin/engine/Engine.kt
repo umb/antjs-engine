@@ -8,7 +8,7 @@ import filehandling.FileLoader
 import server.Game
 import kotlin.math.floor
 
-class Client(val id: String, val scriptPath: String, val playerScript: PlayerScript) {
+class Client(val id: String, val scriptPath: String?, val playerScript: PlayerScript) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other == null || this::class.js != other::class.js) return false
@@ -26,7 +26,7 @@ class Client(val id: String, val scriptPath: String, val playerScript: PlayerScr
 }
 
 class Engine(val game: Game) {
-    val basepath = "/Users/rick/Documents/dynmic-js-test/clients"
+    val basepath = "/tmp/dynmic-js-test/clients"
     private val colonies: MutableMap<Client, AntColony> = mutableMapOf()
     private val gameState: GameState = GameState()
     val gamefieldsize: Int
@@ -47,24 +47,21 @@ class Engine(val game: Game) {
         }
     }
 
+    fun loadClientDirect(clientId: String, code: String) {
 
-    fun loadClients() {
-        val clientDirectories = FileLoader.walkDir(basepath)
-        for (dir in clientDirectories) {
-            val clientId = dir.split("/").last()
-            val scriptPath = "$dir/ant.js"
-            println("loading client $clientId with script $scriptPath")
+        println("loading client $clientId with inline script")
 
-            val client = Client(clientId, scriptPath, FileLoader.loadClientCode(scriptPath)!!)
+        val client = Client(clientId, null, FileLoader.loadClientCodeDirect(code)!!)
 
-            colonies.getOrPut(client) {
-                val position = Vec2.randomScaled(gamefieldsize)
-                val colony = AntColony(clientId, position)
-                colonyAdded(colony)
-                colony
-            }
+        colonies.getOrPut(client) {
+            val position = Vec2.randomScaled(gamefieldsize)
+            val colony = AntColony(clientId, position)
+            colonyAdded(colony)
+            colony
         }
+
     }
+
 
     private fun colonyAdded(colony: AntColony) {
         for (i in 1..5) {
@@ -102,8 +99,9 @@ class Engine(val game: Game) {
     }
 
     fun addPlayer(id: String, code: String) {
-        FileLoader.putCode(basepath, id, code)
-        loadClients()
+        //FileLoader.putCode(basepath, id, code)
+        //loadClients()
+        loadClientDirect(id, code)
     }
 
     private fun step(client: Client, gameState: GameState, ant: AntGameObject) {

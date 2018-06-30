@@ -17,8 +17,9 @@ private external interface PathModule {
 
 object FileLoader {
 
-    private var fsModule: FS? = require("mz/fs").unsafeCast<FS>()
-    private var pathModule: PathModule? = require("path").unsafeCast<PathModule>()
+    private val fsModule: FS? = require("mz/fs").unsafeCast<FS>()
+    private val pathModule: PathModule? = require("path").unsafeCast<PathModule>()
+    private val requireFromString: dynamic = require("require-from-string")
 
     fun walkDir(path: String): List<String> {
         val clients = mutableListOf<String>()
@@ -45,6 +46,12 @@ object FileLoader {
 
     fun loadClientCode(path: String): PlayerScript? {
         val moduleHolder = require(path)
+
+        return moduleHolder?.unsafeCast<PlayerScript>()
+    }
+
+    fun loadClientCodeDirect(code: String): PlayerScript? {
+        val moduleHolder = requireFromString(code)
         return moduleHolder?.unsafeCast<PlayerScript>()
     }
 

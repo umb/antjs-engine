@@ -103,12 +103,10 @@ kotlin {
 
 kotlinFrontend {
     npm{
-        dependency "express" // production dependency
-        dependency "mz" // production dependency
-        //dependency "kotlinx-coroutines-core@0.23.3" // production dependency
-        //dependency "kotlin@1.2.50" // production dependency
+        dependency "express"
+        dependency "mz"
+        dependency "require-from-string"
+        dependency "kotlinx-coroutines-core@0.23.3" // production dependency
+        dependency "kotlin@1.2.50" // production dependency
     }
-
-
-
 }
