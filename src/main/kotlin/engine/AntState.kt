@@ -29,6 +29,7 @@ class Moving(val target: Vec2?) : AntState() {
         // TODO check for out of bounds
         // TODO scan around our position to discover hostile gameobjects and food
 
+
         val appleInSight = gameState.applesInRange(ant.position, AntGameObject.sightRange2).firstOrNull()
         if (appleInSight != null && playerScript.asDynamic().seeApple != null) {
             playerScript.seeApple(appleInSight)
