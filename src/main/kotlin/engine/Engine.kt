@@ -100,6 +100,7 @@ class Engine(val game: Game) {
 
         // food
         player?.asDynamic().pickup = { target: GameObject -> pickup(ant, target) }
+        player?.asDynamic().carry = ant.carry
 
     }
 
