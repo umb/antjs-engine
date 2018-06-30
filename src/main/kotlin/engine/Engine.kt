@@ -5,24 +5,50 @@ import engine.gameobjects.*
 import engine.helpers.moveStraight
 import engine.math.Vec2
 import filehandling.FileLoader
+import server.Game
 import kotlin.math.floor
 
-class Client(val id: String, val scriptPath: String, val playerScript: PlayerScript)
+class Client(val id: String, val scriptPath: String, val playerScript: PlayerScript) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class.js != other::class.js) return false
 
-object Engine {
-    val gamefieldsize = 100
+        other as Client
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+}
+
+class Engine(val game: Game) {
     val basepath = "/Users/rick/Documents/dynmic-js-test/clients"
-
-
     private val colonies: MutableMap<Client, AntColony> = mutableMapOf()
-
     private val gameState: GameState = GameState()
+    val gamefieldsize: Int
+        get() = game.size
 
     init {
         addBug()
     }
 
-    suspend fun loadClients() {
+    companion object {
+        @Suppress("DEPRECATION")
+        fun random() = kotlin.js.Math.random()
+
+        fun guid(): String {
+            fun s4() = floor((1 + random()) * 0x1000).toInt().toString(16)
+            return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4()
+
+        }
+    }
+
+
+    fun loadClients() {
         val clientDirectories = FileLoader.walkDir(basepath)
         for (dir in clientDirectories) {
             val clientId = dir.split("/").last()
@@ -55,30 +81,12 @@ object Engine {
     }
 
 
-    fun guid(): String {
-
-        fun s4() = floor((1 + random()) * 0x1000).toString().substring(1)
-
-
-        /*
-        function s4() {
-            return Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1);
-        }
-        */
-        return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
-
-    }
-
-
     fun addBug() {
         gameState.bugs.add(Bug(Vec2.randomScaled(gamefieldsize), guid()))
     }
 
-    var tick = 0
-    suspend fun simulate() {
-        tick++
+    fun simulate(): GameState {
+        game.tick++
         for ((client, colony) in colonies) {
             for (ant in colony.ants) {
                 patchClientAnt(client.playerScript, ant)
@@ -86,13 +94,17 @@ object Engine {
             }
         }
 
-        // save game state
-        val saved = JSON.stringify(gameState)
-        FileLoader.savelog("$basepath/../log", tick, saved)
+        //val saved = JSON.stringify(gameState)
+        // FileLoader.savelog("$basepath/../log", game.tick, saved)
+
+        return gameState
+
     }
 
-    @Suppress("DEPRECATION")
-    fun random() = kotlin.js.Math.random()
+    fun addPlayer(id: String, code: String) {
+        FileLoader.putCode(basepath, id, code)
+        loadClients()
+    }
 
     private fun step(client: Client, gameState: GameState, ant: AntGameObject) {
 
@@ -106,6 +118,10 @@ object Engine {
 
     private fun patchClientAnt(player: PlayerScript?, ant: AntGameObject) {
         player?.asDynamic().moveStraight = { dist: Double -> moveStraight(ant, dist) }
+    }
+
+    fun cleanup() {
+
     }
 
 

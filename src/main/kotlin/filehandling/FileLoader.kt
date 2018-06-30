@@ -58,4 +58,19 @@ object FileLoader {
         fsModule?.writeFileSync("${location}.json", data)
 
     }
+
+    fun putCode(path: String, playerId: String, code: String) {
+        val location = pathModule?.join(path, playerId)!!
+
+        if (fsModule?.existsSync(path) == false) {
+            fsModule?.mkdirSync(path)
+
+        }
+
+        if (fsModule?.existsSync(location) == false) {
+            fsModule?.mkdirSync(location)
+        }
+
+        fsModule?.writeFileSync("$location/ant.js", code)
+    }
 }

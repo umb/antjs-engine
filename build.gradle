@@ -1,5 +1,6 @@
 apply plugin: 'kotlin2js'
 apply plugin: 'com.moowork.node'
+apply plugin: 'org.jetbrains.kotlin.frontend'
 
 archivesBaseName = 'antme-engine-js'
 
@@ -24,11 +25,16 @@ buildscript {
         jcenter()
         mavenCentral()
         maven { url "https://plugins.gradle.org/m2/" }
+        maven {
+            url "https://dl.bintray.com/kotlin/kotlin-eap"
+        }
     }
     dependencies {
         classpath "com.eriwen:gradle-js-plugin:2.14.1"
         classpath 'com.moowork.gradle:gradle-node-plugin:1.2.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "org.jetbrains.kotlin:kotlin-frontend-plugin:0.0.31"
+
     }
 }
 
@@ -44,10 +50,12 @@ dependencies {
     testCompile "org.jetbrains.kotlin:kotlin-test-js:$kotlinVersion"
 }
 
-[compileKotlin2Js, compileTestKotlin2Js]*.configure {
-    kotlinOptions.moduleKind = "umd"
+compileKotlin2Js {
+    kotlinOptions.metaInfo = true
+    kotlinOptions.outputFile = "$project.buildDir.path/js/${project.name}.js"
     kotlinOptions.sourceMap = true
-    kotlinOptions.sourceMapEmbedSources = "always"
+    kotlinOptions.moduleKind = 'umd'
+    kotlinOptions.main = "call"
 }
 
 task populateNodeModules(type: Copy, dependsOn: compileKotlin2Js) {
@@ -91,4 +99,16 @@ kotlin {
     experimental {
         coroutines "enable"
     }
+}
+
+kotlinFrontend {
+    npm{
+        dependency "express" // production dependency
+        dependency "mz" // production dependency
+        //dependency "kotlinx-coroutines-core@0.23.3" // production dependency
+        //dependency "kotlin@1.2.50" // production dependency
+    }
+
+
+
 }
